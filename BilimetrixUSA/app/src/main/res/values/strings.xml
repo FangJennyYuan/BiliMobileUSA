@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Bilimetrix USA</string>
+    <string name="camera_icon">camera_icon</string>
+    <string name="ok">OK</string>
+    <string name="mgdl_units_str">mg/dL</string>
+    <string name="micromol_units_str">µmol</string>
+    <string name="close_button_desc">close button</string>
+    <string name="rectangle_guide_desc">rectangular guide</string>
+</resources>

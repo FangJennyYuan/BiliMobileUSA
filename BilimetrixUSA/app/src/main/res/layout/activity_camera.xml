@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.bilimetrixusa.bilimetrixusa.CameraPreview
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+    </com.bilimetrixusa.bilimetrixusa.CameraPreview>
+
+    <com.bilimetrixusa.bilimetrixusa.TransparentView
+        android:id="@+id/transparentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/camera_preview"
+        app:layout_constraintStart_toStartOf="@+id/camera_preview"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/rectangleGuide"
+        android:layout_width="160dp"
+        android:layout_height="264dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rectangle"
+        android:contentDescription="@string/rectangle_guide_desc"
+        android:scaleType="fitXY"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/captureButtonBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/transparentView"
+        app:layout_constraintTop_toTopOf="@+id/transparentView">
+    </ImageView>
+
+    <ImageView
+        android:id="@+id/captureButtonBackground"
+        android:layout_width="match_parent"
+        android:layout_height="95dp"
+        android:src="@android:color/black"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/camera_preview"
+        app:layout_constraintEnd_toEndOf="@+id/camera_preview"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/camera_preview"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <ImageView
+        android:id="@+id/captureButton"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:onClick="onCaptureClick"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/captureButtonBackground"
+        app:layout_constraintEnd_toEndOf="@+id/captureButtonBackground"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="@+id/captureButtonBackground"
+        app:layout_constraintTop_toTopOf="@+id/captureButtonBackground"
+        android:src="@drawable/capture_button" />
+
+</android.support.constraint.ConstraintLayout>

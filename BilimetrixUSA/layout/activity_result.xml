@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResultActivity">
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="183dp"
+        android:layout_height="195dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/sbl_us_units"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:gravity="center"
+        android:text="@string/us_units_str"
+        android:textSize="50dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        tools:layout_editor_absoluteX="132dp" />
+
+    <TextView
+        android:id="@+id/sbl_eu_units"
+        android:layout_width="wrap_content"
+        android:layout_height="62dp"
+        android:gravity="center"
+        android:text="@string/eu_units_str"
+        android:textSize="50dp"
+        app:layout_constraintEnd_toEndOf="@+id/sbl_eu_num"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="@+id/sbl_eu_num"
+        app:layout_constraintTop_toBottomOf="@+id/sbl_eu_num" />
+
+    <TextView
+        android:id="@+id/sbl_us_num"
+        android:layout_width="wrap_content"
+        android:layout_height="121dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="100.0"
+        android:textColor="@android:color/black"
+        android:textSize="100dp"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="@+id/sbl_us_units"
+        app:layout_constraintStart_toStartOf="@+id/sbl_us_units" />
+
+    <TextView
+        android:id="@+id/sbl_eu_num"
+        android:layout_width="wrap_content"
+        android:layout_height="121dp"
+        android:layout_marginTop="50dp"
+        android:gravity="center"
+        android:text="200.0"
+        android:textColor="@android:color/black"
+        android:textSize="100dp"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        tools:layout_editor_absoluteX="79dp" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".5" />
+
+    <ImageButton
+        android:id="@+id/closeButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:adjustViewBounds="true"
+        android:background="@color/white"
+        android:onClick="onCloseClick"
+        android:scaleType="fitCenter"
+        android:src="@drawable/cancel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
