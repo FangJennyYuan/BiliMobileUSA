@@ -69,7 +69,9 @@ public class SBLCalculator {
     private static void createColorBilirubinSR() {
         sr = new SimpleRegression();
         for (int i = 0; i < testCardSaturations.size(); i++) {
-            sr.addData(testCardSaturations.get(i), testCardSBLs.get(i));
+            if (testCardSBLs.get(i) != 0) {
+                sr.addData(testCardSaturations.get(i), testCardSBLs.get(i));
+            }
         }
     }
 
@@ -83,5 +85,15 @@ public class SBLCalculator {
         double prediction = sr.predict(testStripSaturation);
         Log.d("calc", "PREDICTION: " + prediction);
         return prediction;
+    }
+
+    public static double calcTestStripSBLInterpolation() {
+        for (int i = 1; i < testCardSaturations.size(); i++) {
+            if (testStripSaturation >= testCardSaturations.get(i-1) && testStripSaturation < testCardSaturations.get(i)) {
+                double prediction = testCardSBLs.get(i-1) + (testCardSBLs.get(i)-testCardSBLs.get(i-1))/(testCardSaturations.get(i)-testCardSaturations.get(i-1))*(testStripSaturation-testCardSaturations.get(i-1));
+                return prediction;
+            }
+        }
+        return -1;
     }
 }
