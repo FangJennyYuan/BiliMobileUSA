@@ -37,6 +37,7 @@ public class ImageToSBL {
     private static Bitmap imgResult;
     private static Bitmap blackWhiteImgResult;
     private static RGBColor testStripRBG;
+    private double[] diffBlocks = new double[7];
     private cordinates testStripTop;
     private cordinates testStripBottom;
     private cordinates testStripLeft;
@@ -76,7 +77,6 @@ public class ImageToSBL {
         int alpha = 0;
         int realColor;
         RGBColor[] colorBlocks = new RGBColor[7];
-        double[] diffBlocks = new double[7];
         RGBColor RGBcolorBlock;
 
 
@@ -129,13 +129,18 @@ public class ImageToSBL {
 
         //double min = diffBlocks[0];
         int minIndex = 0;
+        int secondIndex = 0;
         for (int i=1; i<7; i++){
-            if (diffBlocks[minIndex] > diffBlocks[i]){
-                minIndex = i;
+            if (diffBlocks[secondIndex] > diffBlocks[i]){
+                if (diffBlocks[secondIndex] > diffBlocks[minIndex]){
+                    minIndex = i;
+                }else{
+                    secondIndex = i;
+                }
             }
         }
 
-        findBlockSBL(minIndex);
+        findBlockSBL(minIndex, secondIndex);
 
 
     }
@@ -463,30 +468,47 @@ public class ImageToSBL {
         return locations;
     }
 
-    private static void findBlockSBL(int index){
-        switch(index) {
+    private void findBlockSBL(int index, int secondIndex){
+        if (Math.abs(secondIndex-index) > 1){
+            //error
+        }
+
+        double minResult = findBlockSBL(index);
+        double secondResult = findBlockSBL(secondIndex);
+
+
+        result = minResult*(1- (diffBlocks[index]/100)) + 
+                secondIndex*(1- (diffBlocks[secondIndex]/100));
+
+    }
+
+
+    private double findBlockSBL(int val){
+        double SBL = Double.MIN_VALUE;
+        switch(val) {
             case 0:
-                result = -0.2;
+                SBL = -0.2;
                 break;
             case 1:
-                result = 5.4;
+                SBL = 5.4;
                 break;
             case 2:
-                result = 10;
+                SBL = 10;
                 break;
             case 3:
-                result = 15.4;
+                SBL = 15.4;
                 break;
             case 4:
-                result = 21.5;
+                SBL = 21.5;
                 break;
             case 5:
-                result = 26;
+                SBL = 26;
                 break;
             case 6:
-                result = 29.8;
+                SBL = 29.8;
                 break;
         }
+        return SBL;
     }
 
     private static RGBColor calcAverageRGB(int x, int y){
