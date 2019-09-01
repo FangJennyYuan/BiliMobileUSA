@@ -37,11 +37,10 @@ public class ImageToSBL {
     private static Bitmap imgResult;
     private static Bitmap blackWhiteImgResult;
     private static RGBColor testStripRBG;
-    private ArrayList<RGBColor> testStrip = new ArrayList<RGBColor>();
-    private int testStripTop;
-    private int testStripBottom;
-    private int testStripLeft;
-    private int testStripRight;
+    private cordinates testStripTop;
+    private cordinates testStripBottom;
+    private cordinates testStripLeft;
+    private cordinates testStripRight;
     private static ArrayList<float[]> hsvList = new ArrayList<>();
 
     public static Mat img;
@@ -228,6 +227,7 @@ public class ImageToSBL {
         //loop through expected area pixels, and find the pixels when color stop changing.
         cordinates possibleTestStripStart = new cordinates(widthImg/2, heightImg/2);
 
+        ArrayList<RGBColor> testStrip = new ArrayList<RGBColor>();
 
         int color;
         int red = 0;
@@ -246,7 +246,7 @@ public class ImageToSBL {
         //Store color difference on the middle section and check for 10 pixels where color is not different.
         int validPixels = 10;
         //int validStart = possibleStartHeight;
-        testStripTop = possibleTestStripStart.getY();
+        testStripTop = new cordinates( widthImg/2, possibleTestStripStart.getY());
 
         for(int i=1; i<testStrip.size() && validPixels!=0; i++){
             colorDiff.add(calcDistance(testStrip.get(i-1).getRed(),testStrip.get(i-1).getGreen(),testStrip.get(i-1).getBlue(),
@@ -258,7 +258,7 @@ public class ImageToSBL {
             }
 
             if (validPixels == 0){
-                testStripTop = testStripTop + i - 10;
+                testStripTop.setY(testStripTop.getY() + i - 10);
             }
         }
 
@@ -272,7 +272,7 @@ public class ImageToSBL {
         RGBColor result = null;
 
 
-        for (int i=testStripTop ; i<testStripTop+10; i++){
+        for (int i=testStripTop.getY() ; i<testStripTop.getY()+10; i++){
             color += imgResult.getPixel(widthImg/2, i);
             result = new RGBColor(imgResult.getPixel(widthImg/2, i));
             Color.colorToHSV(result.getColorResult(), hsv);
@@ -288,7 +288,7 @@ public class ImageToSBL {
     }
 
     private RGBColor calcTestStripRBGTopLeftRight(int widthImg, int heightImg){
-        cordinates possibleTestStripStart = new cordinates(widthImg/2, heightImg/2);
+        cordinates possibleTestStripStart = new cordinates(widthImg/2, heightImg/2+heightImg/4);
         int left = 0;
         int right = 0;
         int color;
@@ -297,11 +297,11 @@ public class ImageToSBL {
         int blue = 0;
         RGBColor result = null;
 
-        //start from the middle, work to the left and find where color turned black,
-        //then work down half and find the 5 pixels to the right.
-        //Do the same for the right side.
-        cordinates possibleLeftSide = null;
-        cordinates possibleRightSide = null;
+        /*start from the middle, work to the left and find where color turned black,
+        then work down half and find the 5 pixels to the right.
+        Do the same for the right side. */
+        testStripLeft = null;
+        testStripRight = null;
 
         blackWhiteImgResult = createContrast(imgResult, 50);
 
@@ -309,34 +309,80 @@ public class ImageToSBL {
             color = blackWhiteImgResult.getPixel(possibleTestStripStart.getX()-left, possibleTestStripStart.getY());
             left++;
         }while (color != Color.BLACK && possibleTestStripStart.getX()-left > 0);
-
-        //System.out.print(left);
-
-        possibleLeftSide = new cordinates(possibleTestStripStart.getX()-left+10, possibleTestStripStart.getY());
+        testStripLeft = new cordinates(possibleTestStripStart.getX()-left+10, possibleTestStripStart.getY());
 
 
         do{
             color = blackWhiteImgResult.getPixel(possibleTestStripStart.getX()+right, possibleTestStripStart.getY());
             right++;
         }while (color != Color.BLACK && possibleTestStripStart.getX()+right < widthImg);
-
-        //System.out.print(right);
-
-        possibleRightSide = new cordinates(possibleTestStripStart.getX()+right-10, possibleTestStripStart.getY());
+        testStripRight = new cordinates(possibleTestStripStart.getX()+right-10, possibleTestStripStart.getY());
 
 
+
+        /*start from the left, and stop at right.
+        Then find 5 pixels where the colors stop changing from the left and right*/
+        RGBColor temp;
+        ArrayList<RGBColor> testStrip = new ArrayList<RGBColor>();
+        int getX = testStripLeft.getX();
+        while( getX < testStripRight.getX()){
+            temp = new RGBColor(imgResult.getPixel(testStripLeft.getX()+getX, testStripLeft.getY()));
+            getX++;
+            testStrip.add(temp);
+        }
+
+
+        //Test strip left side
+        ArrayList<Double> colorDiff = new ArrayList<Double>();
+        //Store color difference on the left section and check for 5 pixels where color is not different.
+        int validPixels = 5;
+
+        for(int i=1; i<testStrip.size() && validPixels!=0; i++){
+            colorDiff.add(calcDistance(testStrip.get(i-1).getRed(),testStrip.get(i-1).getGreen(),testStrip.get(i-1).getBlue(),
+                    testStrip.get(i).getRed(), testStrip.get(i).getGreen(), testStrip.get(i).getBlue()));
+            if (colorDiff.get(i-1) < 5.0){
+                validPixels--;
+            }else{
+                validPixels = 5;
+            }
+
+            if (validPixels == 0){
+                testStripLeft.setY(testStripLeft.getX() + i - 5);
+            }
+        }
+
+        validPixels = 5;
+        for(int i=testStrip.size()-1; i>0 && validPixels!=0; i--){
+            colorDiff.add(calcDistance(testStrip.get(i-1).getRed(),testStrip.get(i-1).getGreen(),testStrip.get(i-1).getBlue(),
+                    testStrip.get(i).getRed(), testStrip.get(i).getGreen(), testStrip.get(i).getBlue()));
+            if (colorDiff.get(i-1) < 5.0){
+                validPixels--;
+            }else{
+                validPixels = 5;
+            }
+
+            if (validPixels == 0){
+                testStripRight.setY(testStripRight.getX() - i + 5);
+            }
+        }
+
+        //check where you start and end for the left->right
+        System.out.println(testStripLeft.getX());
+        System.out.println(testStripRight.getX());
+
+        color = 0;
         //Left side of the test strip.
         for (int i=0; i<5; i++){
-            color += imgResult.getPixel(possibleLeftSide.getX()+i, possibleLeftSide.getY());
-            result = new RGBColor(imgResult.getPixel(possibleLeftSide.getX()+i, possibleLeftSide.getY()));
+            color += imgResult.getPixel(testStripLeft.getX()+i, testStripLeft.getY());
+            result = new RGBColor(imgResult.getPixel(testStripLeft.getX()+i, testStripLeft.getY()));
             red += result.getRed();
             green += result.getGreen();
             blue += result.getBlue();
         }
 
         for (int i=0; i<5; i++){
-            color += imgResult.getPixel(possibleRightSide.getX()-i, possibleRightSide.getY());
-            result = new RGBColor(imgResult.getPixel(possibleRightSide.getX()-i, possibleRightSide.getY()));
+            color += imgResult.getPixel(testStripRight.getX()-i, testStripRight.getY());
+            result = new RGBColor(imgResult.getPixel(testStripRight.getX()-i, testStripRight.getY()));
             red += result.getRed();
             green += result.getGreen();
             blue += result.getBlue();
@@ -349,17 +395,54 @@ public class ImageToSBL {
         green += top.getGreen()*10;
         blue += top.getBlue()*10;
 
-        result = new RGBColor(color/30, red/30, green/30, blue/30);
+        result = new RGBColor(color/20, red/20, green/20, blue/20);
 
         return result;
     }
 
     private RGBColor calcTestStripRBGSquire(int widthImg, int heightImg){
-        //find where they start changing (already found the top, left and right)
-        //need to look at the bottom as well.
+        /*find where they start changing (already found the top, left and right)
+        need to look at the bottom as well once we get the blood to know where to stop for red.
+        Need to start from the top, then look at left/right stop at left.getY()(height/2 + height/4)
+        */
 
-
+        cordinates topLeft;
+        cordinates topRight;
+        cordinates bottomLeft;
+        cordinates bottomRight;
+        int color=0;
+        int red = 0;
+        int green = 0;
+        int blue = 0;
         RGBColor result = null;
+
+        topLeft = new cordinates(testStripLeft.getX(), testStripTop.getY());
+        topRight = new cordinates(testStripRight.getX(), testStripTop.getY());
+        bottomLeft = new cordinates(testStripLeft.getX(), testStripLeft.getY());
+        bottomRight = new cordinates(testStripRight.getX(), testStripRight.getY());
+
+
+
+        //Find the colors squire
+        int squireWidth = topRight.getX() - topLeft.getX();
+        int squireHeight = bottomLeft.getY() - topLeft.getY();
+        for(int i=0; i<squireHeight;i++){
+            for(int j=0; j<squireWidth; j++){
+                color += imgResult.getPixel(topLeft.getX()+j, topLeft.getY()+i);
+                result = new RGBColor(imgResult.getPixel(topLeft.getX()+j, topLeft.getY()+i));
+                red += result.getRed();
+                green += result.getGreen();
+                blue += result.getBlue();
+            }
+        }
+
+
+        //find the average of the squire
+        result = new RGBColor(color/squireHeight*squireWidth,
+                red/squireHeight*squireWidth,
+                green/squireHeight*squireWidth,
+                blue/squireHeight*squireWidth);
+
         return result;
     }
 
