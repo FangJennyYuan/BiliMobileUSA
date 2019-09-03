@@ -436,24 +436,30 @@ public class ImageToSBL {
         Log.d("calc", "2nd min index: " + secondIndex + ", secondResult: " + secondResult + ", diffBlocks: " + diffBlocks[secondIndex]);
 
 
+        double diffColor = diffBlocks[secondIndex]-diffBlocks[index];
+        double weight = 1-diffColor/diffBlocks[index]*2;
+        double diffBili = Math.abs(minResult - secondResult);
+
+
+        if (weight < 0 || diffColor > diffBlocks[index]){
+            result = minResult;
+        }
+        else if (index < secondIndex){
+            result = minResult + weight*diffBili/2;
+        }else{
+            result = minResult - weight*diffBili/2;
+        }
+
+        System.out.println(result);
+
+        /*
+        equal weights
         double weightedTotal = diffBlocks[index] + diffBlocks[secondIndex];
         result = (1-(diffBlocks[index]/weightedTotal))*minResult +
                 (1-(diffBlocks[secondIndex]/weightedTotal))*secondResult;
-
-        /*
-
-        if (2 * diffBlocks[index] > diffBlocks[secondIndex]){
-            result = minResult;
-        }
-        else if (2 * diffBlocks[secondIndex] > diffBlocks[index]){
-            result = secondResult;
-        }
-        else{
-            result = (1-(diffBlocks[index]/weightedTotal))*minResult +
-                    (1-(diffBlocks[secondIndex]/weightedTotal))*secondResult;
-        }
-
         */
+
+
 
         /*
         double diffBili = Math.abs(minResult-secondResult)/2;
