@@ -102,7 +102,7 @@ public class ImageToSBL {
         System.out.println(hsv);
         */
 
-        System.out.println(hsvList);
+        //System.out.println(hsvList);
 
         //testStripRBG = calcAverageRBG(widthImg/2, (heightImg/4)/2+(2*(heightImg/4)));
 
@@ -122,23 +122,42 @@ public class ImageToSBL {
             colorBlocks[i] = RGBcolorBlock;
         }
 
-        for (int i=0; i<7; i++){
-            System.out.print(colorBlocks[i] + ", ");
-            System.out.println(diffBlocks[i]);
-        }
 
         //double min = diffBlocks[0];
+
+        int minIndex = 0;
+        int secondIndex = 0;
+        for (int i=1; i<7; i++){
+            if (diffBlocks[minIndex] > diffBlocks[i]){
+                minIndex = i;
+            }
+        }
+
+        if (minIndex == 0){
+            secondIndex = 1;
+        }else if (minIndex == 6){
+            secondIndex = 5;
+        }else{
+            if(diffBlocks[minIndex-1] > diffBlocks[minIndex+1]){
+                secondIndex = minIndex+1;
+            }else{
+                secondIndex = minIndex-1;
+            }
+        }
+
+        /*
         int minIndex = 0;
         int secondIndex = 0;
         for (int i=1; i<7; i++){
             if (diffBlocks[secondIndex] > diffBlocks[i]){
-                if (diffBlocks[secondIndex] > diffBlocks[minIndex]){
-                    minIndex = i;
-                }else{
+                if (diffBlocks[secondIndex] < diffBlocks[minIndex]){
                     secondIndex = i;
+                }else{
+                    minIndex = i;
                 }
             }
         }
+        */
 
         findBlockSBL(minIndex, secondIndex);
 
@@ -153,78 +172,12 @@ public class ImageToSBL {
 
         RGBColor squire = calcTestStripRBGSquire(widthImg, heightImg);
 
+        Log.d("calc", "top: (" + top.getRed() + ", " + top.getGreen() + ", " + top.getBlue() + ")");
+        Log.d("calc", "topLeftRight: (" + topLeftRight.getRed() + ", " + topLeftRight.getGreen() + ", " + topLeftRight.getBlue() + ")");
+        Log.d("calc", "squire: (" + squire.getRed() + ", " + squire.getGreen() + ", " + squire.getBlue() + ")");
         //return top;
         //return topLeftRight;
         return squire;
-    }
-
-    /*
-    private static Bitmap toGrayscale(Bitmap bmpOriginal)
-    {
-        int width, height;
-        height = bmpOriginal.getHeight();
-        width = bmpOriginal.getWidth();
-
-        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(bmpGrayscale);
-        Paint paint = new Paint();
-        ColorMatrix cm = new ColorMatrix();
-        cm.setSaturation(0);
-        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
-        paint.setColorFilter(f);
-        c.drawBitmap(bmpOriginal, 0, 0, paint);
-        return bmpGrayscale;
-    }
-    */
-
-    public static Bitmap createContrast(Bitmap src, double value) {
-        // image size
-        int width = src.getWidth();
-        int height = src.getHeight();
-        // create output bitmap
-        Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
-        // color information
-        int A, R, G, B;
-        int pixel;
-        // get contrast value
-        double contrast = Math.pow((100 + value) / 100, 2);
-
-        // scan through all pixels
-        for(int x = 0; x < width; ++x) {
-            for(int y = 0; y < height; ++y) {
-                // get pixel color
-                pixel = src.getPixel(x, y);
-                A = Color.alpha(pixel);
-                // apply filter contrast for every channel R, G, B
-                R = Color.red(pixel);
-                R = (int)(((((R / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-                if(R < 0) { R = 0; }
-                else if(R > 255) { R = 255; }
-
-                G = Color.red(pixel);
-                G = (int)(((((G / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-                if(G < 0) { G = 0; }
-                else if(G > 255) { G = 255; }
-
-                B = Color.red(pixel);
-                B = (int)(((((B / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
-                if(B < 0) { B = 0; }
-                else if(B > 255) { B = 255; }
-
-                // set new pixel color to output bitmap
-                bmOut.setPixel(x, y, Color.argb(A, R, G, B));
-            }
-        }
-
-        return bmOut;
-    }
-
-    private static float[] calcTestStripHSV(int widthImg, int heightImg){
-        float[] result = null;
-
-
-
-        return result;
     }
 
 
@@ -293,7 +246,7 @@ public class ImageToSBL {
     }
 
     private RGBColor calcTestStripRBGTopLeftRight(int widthImg, int heightImg){
-        cordinates possibleTestStripStart = new cordinates(widthImg/2, heightImg/2+heightImg/4);
+        cordinates possibleTestStripStart = new cordinates(widthImg/2, heightImg/2+heightImg/6);
         int left = 0;
         int right = 0;
         int color;
@@ -314,14 +267,14 @@ public class ImageToSBL {
             color = blackWhiteImgResult.getPixel(possibleTestStripStart.getX()-left, possibleTestStripStart.getY());
             left++;
         }while (color != Color.BLACK && possibleTestStripStart.getX()-left > 0);
-        testStripLeft = new cordinates(possibleTestStripStart.getX()-left+10, possibleTestStripStart.getY());
+        testStripLeft = new cordinates(possibleTestStripStart.getX()-left, possibleTestStripStart.getY());
 
 
         do{
             color = blackWhiteImgResult.getPixel(possibleTestStripStart.getX()+right, possibleTestStripStart.getY());
             right++;
         }while (color != Color.BLACK && possibleTestStripStart.getX()+right < widthImg);
-        testStripRight = new cordinates(possibleTestStripStart.getX()+right-10, possibleTestStripStart.getY());
+        testStripRight = new cordinates(possibleTestStripStart.getX()+right, possibleTestStripStart.getY());
 
 
 
@@ -329,8 +282,8 @@ public class ImageToSBL {
         Then find 5 pixels where the colors stop changing from the left and right*/
         RGBColor temp;
         ArrayList<RGBColor> testStrip = new ArrayList<RGBColor>();
-        int getX = testStripLeft.getX();
-        while( getX < testStripRight.getX()){
+        int getX = 0;
+        while( getX < (testStripRight.getX()-testStripLeft.getX())){
             temp = new RGBColor(imgResult.getPixel(testStripLeft.getX()+getX, testStripLeft.getY()));
             getX++;
             testStrip.add(temp);
@@ -352,28 +305,31 @@ public class ImageToSBL {
             }
 
             if (validPixels == 0){
-                testStripLeft.setY(testStripLeft.getX() + i - 5);
+                testStripLeft.setX(testStripLeft.getX() + i - 5);
             }
         }
 
+        colorDiff = new ArrayList<Double>();
         validPixels = 5;
+        int counter = 0;
         for(int i=testStrip.size()-1; i>0 && validPixels!=0; i--){
             colorDiff.add(calcDistance(testStrip.get(i-1).getRed(),testStrip.get(i-1).getGreen(),testStrip.get(i-1).getBlue(),
                     testStrip.get(i).getRed(), testStrip.get(i).getGreen(), testStrip.get(i).getBlue()));
-            if (colorDiff.get(i-1) < 5.0){
+            if (colorDiff.get(counter) < 5.0){
                 validPixels--;
             }else{
                 validPixels = 5;
             }
 
             if (validPixels == 0){
-                testStripRight.setY(testStripRight.getX() - i + 5);
+                testStripRight.setX(testStripRight.getX() - counter + 5);
             }
+            counter++;
         }
 
         //check where you start and end for the left->right
-        System.out.println(testStripLeft.getX());
-        System.out.println(testStripRight.getX());
+        //System.out.println(testStripLeft.getX());
+        //System.out.println(testStripRight.getX());
 
         color = 0;
         //Left side of the test strip.
@@ -443,10 +399,10 @@ public class ImageToSBL {
 
 
         //find the average of the squire
-        result = new RGBColor(color/squireHeight*squireWidth,
-                red/squireHeight*squireWidth,
-                green/squireHeight*squireWidth,
-                blue/squireHeight*squireWidth);
+        result = new RGBColor(color/(squireHeight*squireWidth),
+                red/(squireHeight*squireWidth),
+                green/(squireHeight*squireWidth),
+                blue/(squireHeight*squireWidth));
 
         return result;
     }
@@ -475,10 +431,21 @@ public class ImageToSBL {
 
         double minResult = findBlockSBL(index);
         double secondResult = findBlockSBL(secondIndex);
+        double diffBili = Math.abs(minResult-secondResult)/2;
+        double weightedDiff = Math.abs(diffBlocks[index]-diffBlocks[secondIndex]);
+        Log.d("calc", "min index: " + index + ", minResult: " + minResult);
+        Log.d("calc", "2nd min index: " + secondIndex + ", secondResult: " + secondResult);
 
+        if (index < secondIndex){
+            //add to index
+            result = minResult + (1-(weightedDiff/diffBlocks[index]))*diffBili;
+        }else{
+            //minus from secondIndex
+            result = Math.abs(secondResult - (1-(weightedDiff/diffBlocks[secondIndex]))*diffBili);
+        }
 
-        result = minResult*(1- (diffBlocks[index]/100)) + 
-                secondIndex*(1- (diffBlocks[secondIndex]/100));
+        //System.out.println(result);
+
 
     }
 
@@ -533,6 +500,75 @@ public class ImageToSBL {
     }
 
     public double getResult(){
+        return result;
+    }
+
+    /*
+    private static Bitmap toGrayscale(Bitmap bmpOriginal)
+    {
+        int width, height;
+        height = bmpOriginal.getHeight();
+        width = bmpOriginal.getWidth();
+
+        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmpGrayscale);
+        Paint paint = new Paint();
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+        paint.setColorFilter(f);
+        c.drawBitmap(bmpOriginal, 0, 0, paint);
+        return bmpGrayscale;
+    }
+    */
+
+    public static Bitmap createContrast(Bitmap src, double value) {
+        // image size
+        int width = src.getWidth();
+        int height = src.getHeight();
+        // create output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
+        // color information
+        int A, R, G, B;
+        int pixel;
+        // get contrast value
+        double contrast = Math.pow((100 + value) / 100, 2);
+
+        // scan through all pixels
+        for(int x = 0; x < width; ++x) {
+            for(int y = 0; y < height; ++y) {
+                // get pixel color
+                pixel = src.getPixel(x, y);
+                A = Color.alpha(pixel);
+                // apply filter contrast for every channel R, G, B
+                R = Color.red(pixel);
+                R = (int)(((((R / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+                if(R < 0) { R = 0; }
+                else if(R > 255) { R = 255; }
+
+                G = Color.red(pixel);
+                G = (int)(((((G / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+                if(G < 0) { G = 0; }
+                else if(G > 255) { G = 255; }
+
+                B = Color.red(pixel);
+                B = (int)(((((B / 255.0) - 0.5) * contrast) + 0.5) * 255.0);
+                if(B < 0) { B = 0; }
+                else if(B > 255) { B = 255; }
+
+                // set new pixel color to output bitmap
+                bmOut.setPixel(x, y, Color.argb(A, R, G, B));
+            }
+        }
+
+        return bmOut;
+    }
+
+    private static float[] calcTestStripHSV(int widthImg, int heightImg){
+        float[] result = null;
+
+
+
         return result;
     }
 
