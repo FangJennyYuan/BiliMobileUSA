@@ -429,12 +429,35 @@ public class ImageToSBL {
             //error
         }
 
+
         double minResult = findBlockSBL(index);
         double secondResult = findBlockSBL(secondIndex);
+        Log.d("calc", "min index: " + index + ", minResult: " + minResult + ", diffBlocks: " + diffBlocks[index]);
+        Log.d("calc", "2nd min index: " + secondIndex + ", secondResult: " + secondResult + ", diffBlocks: " + diffBlocks[secondIndex]);
+
+
+        double weightedTotal = diffBlocks[index] + diffBlocks[secondIndex];
+        result = (1-(diffBlocks[index]/weightedTotal))*minResult +
+                (1-(diffBlocks[secondIndex]/weightedTotal))*secondResult;
+
+        /*
+
+        if (2 * diffBlocks[index] > diffBlocks[secondIndex]){
+            result = minResult;
+        }
+        else if (2 * diffBlocks[secondIndex] > diffBlocks[index]){
+            result = secondResult;
+        }
+        else{
+            result = (1-(diffBlocks[index]/weightedTotal))*minResult +
+                    (1-(diffBlocks[secondIndex]/weightedTotal))*secondResult;
+        }
+
+        */
+
+        /*
         double diffBili = Math.abs(minResult-secondResult)/2;
         double weightedDiff = Math.abs(diffBlocks[index]-diffBlocks[secondIndex]);
-        Log.d("calc", "min index: " + index + ", minResult: " + minResult);
-        Log.d("calc", "2nd min index: " + secondIndex + ", secondResult: " + secondResult);
 
         if (index < secondIndex){
             //add to index
@@ -444,7 +467,8 @@ public class ImageToSBL {
             result = Math.abs(secondResult - (1-(weightedDiff/diffBlocks[secondIndex]))*diffBili);
         }
 
-        //System.out.println(result);
+        System.out.println(result);
+        */
 
 
     }
